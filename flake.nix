@@ -6,14 +6,27 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }: 
-    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux"] (system:
+  outputs = { self, nixpkgs, flake-utils }:
+  let
+    forAllSystems = flake-utils.lib.eachSystem [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
+  in
+  {
+    nixosModules = rec {
+      wings = ./modules/wings;
+      default = wings;
+    };
+
+    packages = forAllSystems (system:
       let
         pkgs = import nixpkgs { inherit system; };
       in
       {
-        packages.wings = pkgs.callPackage ./pkgs/wings { };
-        nixosModules.wings = import ./modules/wings { };
+        wings = pkgs.callPackage ./pkgs/wings { };
+        default = self.packages.${system}.wings;
       }
     );
+  };
 }

@@ -12,28 +12,25 @@ in
       default = null;
       description = "Package to use for Wings daemon";
     };
-    configFile = lib.mkOption {
-      type = lib.types.path;
-      default = "/etc/pterodactyl/config.yml";
-      description = "Path to Wings configuration";
-    };
   };
 
   config = lib.mkIf cfg.enable {
     virtualisation.docker.enable = true;
 
-    systemd.services.wings = {
+    systemd.services.pterodactyl-wings = {
       description = "Pterodactyl Wings";
       after = [ "docker.service" ];
       requires = [ "docker.service" ];
       wantedBy = [ "multi-user.target" ];
 
       serviceConfig = {
-        ExecStart = "${wings}/bin/wings --config ${cfg.configFile}";
+        ExecStart = "${wings}/bin/wings --config /etc/pterodactyl/config.yml";
         Restart = "on-failure";
         RestartSec = 5;
-        DynamicUser = true;
-        StateDirectory = "wings";
+
+        User = "root";
+        Group = "root";
+
         BindPaths = [ "/var/run/docker.sock" ];
         LimitNOFILE = 1048576;
       };
