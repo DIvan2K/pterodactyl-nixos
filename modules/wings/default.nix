@@ -9,7 +9,8 @@ in
     enable = lib.mkEnableOption "Enable Pterodactyl Wings";
     package = lib.mkOption {
       type = lib.types.package;
-      default = null;
+      default = pkgs.wings;
+      defaultText = "pkgs.wings";
       description = "Package to use for Wings daemon";
     };
   };

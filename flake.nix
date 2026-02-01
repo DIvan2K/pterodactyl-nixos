@@ -14,6 +14,9 @@
     ];
   in
   {
+    overlays.default = final: prev: {
+      wings = final.callPackage ./pkgs/wings { };
+    };
     nixosModules = rec {
       wings = ./modules/wings;
       default = wings;
